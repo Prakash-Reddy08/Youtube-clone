@@ -26,15 +26,15 @@ const VideoSchema = new mongoose.Schema({
         default: 0
     },
     tags: {
-        trype: [String],
+        type: [String],
         default: []
     },
     likes: {
-        trype: [String],
+        type: [String],
         default: []
     },
     disLikes: {
-        trype: [String],
+        type: [String],
         default: []
     }
 }, { timestamps: true })
