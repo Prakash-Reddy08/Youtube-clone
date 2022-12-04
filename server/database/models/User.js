@@ -25,6 +25,9 @@ const UserSchema = new mongoose.Schema({
     subscribedUsers: {
         type: [String],
     },
+    refreshToken: {
+        type: String
+    }
 }, { timestamps: true })
 
 export default mongoose.model("User", UserSchema)

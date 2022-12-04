@@ -46,7 +46,7 @@ export const signin = async (req, res, next) => {
         if (!foundUser) {
             return next(createError(404, 'User not found!'))
         }
-        const isPasswordCorrect = bcrypt.compare(password, foundUser.password)
+        const isPasswordCorrect = await bcrypt.compare(password, foundUser.password)
         if (!isPasswordCorrect) {
             return next(createError(400, "Incorrect Email or Password"))
         }
@@ -55,11 +55,11 @@ export const signin = async (req, res, next) => {
         await User.findOneAndUpdate({ _id: foundUser._id },
             { refreshToken }
         )
-        const { password: psw, ...otherDetails } = foundUser._doc;
+        const { password: psw, refreshToken: rft, ...otherDetails } = foundUser._doc;
         res.cookie('refresh_token', refreshToken, { httpOnly: true, sameSite: 'none', secure: true, maxAge: 24 * 60 * 60 * 1000 })
         res.json({ accessToken, ...otherDetails })
     } catch (error) {
-        next(createError(500, error.message));
+        next(error);
     }
 }
 export const googleAuth = async (req, res) => {

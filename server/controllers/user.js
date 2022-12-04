@@ -9,7 +9,7 @@ export const update = async (req, res, next) => {
             }, { new: true })
             res.json(updatedUser).status(200)
         } catch (error) {
-            next(createError(500, error.message))
+            next(error)
         }
     }
     else {

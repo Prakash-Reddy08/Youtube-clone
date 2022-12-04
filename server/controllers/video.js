@@ -7,7 +7,7 @@ export const addVideo = async (req, res, next) => {
         const video = await Video.create({ userId: req.user.id, ...req.body })
         res.json({ video }).status(200)
     } catch (err) {
-        next(err.message)
+        next(err)
     }
 }
 export const updateVideo = async (req, res, next) => {
@@ -23,7 +23,7 @@ export const updateVideo = async (req, res, next) => {
             return next(createError(403, "You can update only your vidoes"))
         }
     } catch (error) {
-        next(error.message)
+        next(error)
     }
 }
 export const deleteVideo = async (req, res, next) => {
@@ -37,7 +37,7 @@ export const deleteVideo = async (req, res, next) => {
             return next(createError(403, "You can delete only your vidoes"))
         }
     } catch (error) {
-        next(error.message)
+        next(error)
     }
 }
 export const getVideo = async (req, res, next) => {
@@ -46,7 +46,7 @@ export const getVideo = async (req, res, next) => {
         if (!foundVideo) return next(createError(400, "No video found"))
         res.json(foundVideo).status(200)
     } catch (error) {
-
+        next(error)
     }
 }
 export const addView = async (req, res, next) => {
@@ -87,7 +87,7 @@ export const sub = async (req, res, next) => {
         );
         res.status(200).json(list.flat().sort((a, b) => b.createdAt - a.createdAt));
     } catch (err) {
-        next(createError(500, err.message));
+        next(err);
     }
 }
 
