@@ -1,36 +1,47 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import styled from 'styled-components'
-
-const Card = ({ type }) => {
-    return (
-        <Link to="/video/test" style={{ textDecoration: "none" }}>
-            <Container type={type}>
-                <Image type={type} src="https://i9.ytimg.com/vi_webp/k3Vfj-e1Ma4/mqdefault.webp?v=6277c159&sqp=CIjm8JUG&rs=AOn4CLDeKmf_vlMC1q9RBEZu-XQApzm6sA" />
-                <Details type={type}>
-                    <ChannelImage type={type} />
-                    <Texts>
-                        <Title>Test Video</Title>
-                        <ChannelName>Prakash</ChannelName>
-                        <Info>434,343 views 1 day ago</Info>
-                    </Texts>
-                </Details>
-            </Container>
-        </Link>
-    )
+import { format } from 'timeago.js'
+import { instance } from '../utils/axios'
+const Card = ({ type, video }) => {
+  const [channel, setChannel] = useState([])
+  useEffect(() => {
+    const fetchChannel = async () => {
+      const res = await instance.get(`/users/find/${video.userId}`)
+      setChannel(res.data);
+    }
+    fetchChannel();
+  }, [video.userId]);
+  return (
+    <Container type={type}>
+      <Link to="/video/test" style={{ textDecoration: "none" }}>
+        <Image type={type} src={video.imgUrl} />
+        <Details type={type}>
+          <ChannelImage type={type} />
+          <Texts>
+            <Title>{video.title}</Title>
+            <ChannelName>{channel.name}</ChannelName>
+            <Info>{video.views} views {format(video.createdAt)}</Info>
+          </Texts>
+        </Details>
+      </Link>
+    </Container>
+  )
 }
 
 const Container = styled.div`
-  width: ${(props) => props.type !== "sm" && "360px"};
+  width: ${(props) => props.type !== "sm" && "auto"};
   margin-bottom: ${(props) => (props.type === "sm" ? "10px" : "45px")};
   cursor: pointer;
+  justify-self:stretch ;
+  border-radius:5% ;
   display: ${(props) => props.type === "sm" && "flex"};
-  gap: 10px;
 `;
 
 const Image = styled.img`
   width: 100%;
-  height: ${(props) => (props.type === "sm" ? "120px" : "202px")};
+  border-radius:5% ;
+  height: ${(props) => (props.type === "sm" ? "120px" : "167px")};
   background-color: #999;
   flex: 1;
 `;
@@ -38,6 +49,7 @@ const Image = styled.img`
 const Details = styled.div`
   display: flex;
   margin-top: ${(props) => props.type !== "sm" && "16px"};
+  margin-left:7px ;
   gap: 12px;
   flex: 1;
 `;
