@@ -39,7 +39,7 @@ export const getUser = async (req, res, next) => {
 export const subscribe = async (req, res, next) => {
     try {
         const isSubscribed = await User.find({ subscribedUsers: { "$in": [req.params.id] } });
-        if (!isSubscribed) {
+        if (!isSubscribed.length) {
             await User.findByIdAndUpdate(req.user.id, {
                 $push: { subscribedUsers: req.params.id },
             });
@@ -76,7 +76,7 @@ export const like = async (req, res, next) => {
     try {
         await Video.findByIdAndUpdate(videoId, {
             $addToSet: { likes: id },
-            $pull: { dislikes: id }
+            $pull: { disLikes: id }
         })
         res.status(200).json("The video has been liked.")
     } catch (err) {
