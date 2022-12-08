@@ -1,18 +1,29 @@
-import React from "react";
+import React, { useEffect } from "react";
 import styled from "styled-components";
-import { instance } from "../utils/axios";
-import { useDispatch } from 'react-redux';
+import { axiosPrivate } from "../utils/axios";
+import { useDispatch, useSelector } from 'react-redux';
 import { loginFailure, loginStart, loginSuccess } from "../features/userSlice";
+import { useNavigate } from 'react-router-dom';
 const SignIn = () => {
+  const navigate = useNavigate();
   const dispatch = useDispatch();
+  const { currentUser } = useSelector(state => state.user)
+  useEffect(() => {
+    if (currentUser) {
+      navigate('/');
+    }
+  }, [navigate, currentUser])
   const handleSignIn = async (e) => {
     e.preventDefault();
     const email = e.target.email.value
     const password = e.target.password.value
     dispatch(loginStart());
     try {
-      const res = await instance.post('/auth/signin', { email, password });
-      dispatch(loginSuccess(res.data));
+      const res = await axiosPrivate.post('/auth/signin', { email, password });
+      const { accessToken, ...userDetails } = res?.data;
+      dispatch(loginSuccess(userDetails));
+      e.target.email.value = ""
+      e.target.password.value = ""
     } catch (error) {
       dispatch(loginFailure())
       console.log(error.response.data.message);
@@ -24,8 +35,10 @@ const SignIn = () => {
     const email = e.target.email.value
     const password = e.target.password.value
     try {
-      const res = await instance.post('/auth/signup', { name, email, password });
-      console.log(res.data);
+      await axiosPrivate.post('/auth/signup', { name, email, password });
+      e.target.name.value = ""
+      e.target.email.value = ""
+      e.target.password.value = ""
     } catch (error) {
       console.log(error.response.data.message);
     }
@@ -36,15 +49,15 @@ const SignIn = () => {
         <Title>Sign in</Title>
         <Form onSubmit={handleSignIn}>
           <SubTitle>to continue to Youtube</SubTitle>
-          <Input name="email" type="email" placeholder="username" />
+          <Input name="email" type="email" placeholder="email" />
           <Input name="password" type="password" placeholder="password" />
           <Button>Sign in</Button>
         </Form>
         <Title>or</Title>
         <Form onSubmit={handleSignUp}>
-          <Input type='text' placeholder="username" />
-          <Input type="email" placeholder="email" />
-          <Input type="password" placeholder="password" />
+          <Input name="name" type='text' placeholder="username" />
+          <Input name="email" type="email" placeholder="email" />
+          <Input name="password" type="password" placeholder="password" />
           <Button>Sign up</Button>
         </Form>
       </Wrapper>

@@ -10,5 +10,10 @@ const axiosPrivate = axios.create({
     headers: { 'Content-Type': 'application/json', "Access-Control-Allow-Origin": "*" },
     withCredentials: true
 });
+const axiosFile = axios.create({
+    baseURL: host,
+    headers: { 'Content-Type': 'multipart/form-data', "Access-Control-Allow-Origin": "*" },
+    withCredentials: true
+});
 
-export { instance, axiosPrivate }
+export { instance, axiosPrivate, axiosFile }

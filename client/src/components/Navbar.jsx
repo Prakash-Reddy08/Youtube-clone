@@ -1,33 +1,38 @@
-import React from 'react'
+import React, { useState } from 'react'
 import styled from 'styled-components';
 import AccountCircleOutlinedIcon from "@mui/icons-material/AccountCircleOutlined";
 import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
 import VideoCallOutlinedIcon from "@mui/icons-material/VideoCallOutlined";
 import { Link } from 'react-router-dom';
 import { useSelector } from 'react-redux'
+import UploadModal from './UploadModal';
 const Navbar = () => {
   const { currentUser } = useSelector(state => state.user)
+  const [open, setOpen] = useState(false);
   return (
-    <Container>
-      <Wrapper>
-        <Search>
-          <Input placeholder="Search" />
-          <SearchOutlinedIcon />
-        </Search>
-        {currentUser ?
-          (<User>
-            <VideoCallOutlinedIcon />
-            <Avatar />
-            {currentUser.name}
-          </User>)
-          : <Link to="/signin" style={{ textDecoration: "none", color: "inherit" }}>
-            <Button>
-              <AccountCircleOutlinedIcon />
-              SIGN IN
-            </Button>
-          </Link>}
-      </Wrapper>
-    </Container>
+    <>
+      <Container>
+        <Wrapper>
+          <Search>
+            <Input placeholder="Search" />
+            <SearchOutlinedIcon />
+          </Search>
+          {currentUser ?
+            (<User>
+              <VideoCallOutlinedIcon onClick={() => setOpen(true)} />
+              <Avatar />
+              {currentUser.name}
+            </User>)
+            : <Link to="/signin" style={{ textDecoration: "none", color: "inherit" }}>
+              <Button>
+                <AccountCircleOutlinedIcon />
+                SIGN IN
+              </Button>
+            </Link>}
+        </Wrapper>
+      </Container>
+      {open && <UploadModal setOpen={setOpen} />}
+    </>
   )
 }
 

@@ -1,14 +1,19 @@
 import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
 import Card from '../components/Card'
-import { instance } from '../utils/axios';
+import { axiosPrivate } from '../utils/axios';
 
 const Home = ({ type }) => {
     const [videos, setVideos] = useState([])
     useEffect(() => {
         const fetchRandomVideos = async () => {
-            const res = await instance.get(`/videos/${type}`)
-            setVideos(res.data);
+            try {
+                const res = await axiosPrivate.get(`/videos/${type}`)
+                setVideos(res.data);
+            }
+            catch (error) {
+                console.log(error.data.message);
+            }
         }
         fetchRandomVideos();
     }, [type]);

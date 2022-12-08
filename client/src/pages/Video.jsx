@@ -1,82 +1,131 @@
-import React from 'react'
+import React, { useState } from 'react'
 import styled from 'styled-components';
 import Card from '../components/Card';
 import ThumbUpOutlinedIcon from "@mui/icons-material/ThumbUpOutlined";
+import ThumbDownIcon from "@mui/icons-material/ThumbDown";
+import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 import ThumbDownOffAltOutlinedIcon from "@mui/icons-material/ThumbDownOffAltOutlined";
 import ReplyOutlinedIcon from "@mui/icons-material/ReplyOutlined";
 import AddTaskOutlinedIcon from "@mui/icons-material/AddTaskOutlined";
 import Comments from '../components/Comments';
+import { useDispatch, useSelector } from 'react-redux';
+import { useParams } from 'react-router-dom';
+import { useEffect } from 'react';
+import { axiosPrivate, instance } from '../utils/axios';
+import { dislike, fetchFailure, fetchStart, fetchSuccess, like } from '../features/videoSlice';
+import { format } from 'timeago.js';
+import { subscription } from '../features/userSlice';
 
 const Video = () => {
-    return (
-        <Container>
-            <Content>
-                <VideoWrapper>
-                    <iframe
-                        width="100%"
-                        height="720"
-                        src="https://www.youtube.com/embed/k3Vfj-e1Ma4"
-                        title="YouTube video player"
-                        frameborder="0"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                        allowfullscreen
-                    ></iframe>
-                </VideoWrapper>
-                <Title>Test Video</Title>
-                <Details>
-                    <Info>7,948,154 views • Jun 22, 2022</Info>
-                    <Buttons>
-                        <Button>
-                            <ThumbUpOutlinedIcon /> 123
-                        </Button>
-                        <Button>
-                            <ThumbDownOffAltOutlinedIcon /> Dislike
-                        </Button>
-                        <Button>
-                            <ReplyOutlinedIcon /> Share
-                        </Button>
-                        <Button>
-                            <AddTaskOutlinedIcon /> Save
-                        </Button>
-                    </Buttons>
-                </Details>
-                <Hr />
-                <Channel>
-                    <ChannelInfo>
-                        <Image src="https://yt3.ggpht.com/yti/APfAmoE-Q0ZLJ4vk3vqmV4Kwp0sbrjxLyB8Q4ZgNsiRH=s88-c-k-c0x00ffffff-no-rj-mo" />
-                        <ChannelDetail>
-                            <ChannelName>Lama Dev</ChannelName>
-                            <ChannelCounter>200K subscribers</ChannelCounter>
-                            <Description>
-                                Lorem ipsum dolor, sit amet consectetur adipisicing elit.
-                                Doloribus laborum delectus unde quaerat dolore culpa sit aliquam
-                                at. Vitae facere ipsum totam ratione exercitationem. Suscipit
-                                animi accusantium dolores ipsam ut.
-                            </Description>
-                        </ChannelDetail>
-                    </ChannelInfo>
-                    <Subscribe>SUBSCRIBE</Subscribe>
-                </Channel>
-                <Hr />
-                <Comments />
-            </Content>
-            <Recommendation>
-                <Card type="sm" />
-                <Card type="sm" />
-                <Card type="sm" />
-                <Card type="sm" />
-                <Card type="sm" />
-                <Card type="sm" />
-                <Card type="sm" />
-                <Card type="sm" />
-                <Card type="sm" />
-                <Card type="sm" />
-                <Card type="sm" />
-                <Card type="sm" />
-                <Card type="sm" />
-            </Recommendation>
-        </Container>
-    )
+  const { currentUser } = useSelector(state => state.user);
+  const { currentVideo, loading } = useSelector(state => state.video);
+  const dispatch = useDispatch();
+
+  const { id } = useParams()
+  const [channel, setChannel] = useState({});
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        dispatch(fetchStart())
+        const video = await instance.get(`/videos/find/${id}`)
+        const channel = await instance.get(`/users/find/${video.data.userId}`)
+        setChannel(channel.data);
+        dispatch(fetchSuccess(video.data))
+      } catch (error) {
+        dispatch(fetchFailure())
+        console.log(error.response.data.message);
+      }
+    }
+    fetchData();
+  }, [id])
+
+  const handleLike = async () => {
+    await axiosPrivate.put(`/users/like/${currentVideo._id}`)
+    dispatch(like(currentUser._id))
+  }
+  const handleDislike = async () => {
+    await axiosPrivate.put(`/users/dislike/${currentVideo._id}`)
+    dispatch(dislike(currentUser._id))
+  }
+
+  const handleSub = async () => {
+    try {
+      currentUser.subscribedUsers.includes(channel._id)
+        ? await axiosPrivate.put(`/users/unsub/${channel._id}`)
+        : await axiosPrivate.put(`/users/sub/${channel._id}`);
+      dispatch(subscription(channel._id));
+    }
+    catch (error) {
+      console.log(error.response.data.message);
+    }
+  };
+  const url = process.env.REACT_APP_SERVER_URL.replace("/api", "")
+  if (loading) {
+    return <>
+      Loading...
+    </>
+  }
+  return (
+    <Container>
+      <Content>
+        <VideoWrapper>
+          <VideoFrame controls><source src={url + currentVideo.videoUrl} /></VideoFrame>
+        </VideoWrapper>
+        <Title>{currentVideo.title}</Title>
+        <Details>
+          <Info>{currentVideo.views} views • {format(currentVideo.createdAt)}</Info>
+          <Buttons>
+            <Button onClick={handleLike}>
+              {currentVideo.likes?.includes(currentUser?._id) ? <ThumbUpIcon /> : <ThumbUpOutlinedIcon />} {currentVideo.likes?.length}
+            </Button>
+            <Button onClick={handleDislike}>
+              {currentVideo.disLikes?.includes(currentUser?._id) ? <ThumbDownIcon /> : <ThumbDownOffAltOutlinedIcon />} Dislike
+            </Button>
+            <Button>
+              <ReplyOutlinedIcon /> Share
+            </Button>
+            <Button>
+              <AddTaskOutlinedIcon /> Save
+            </Button>
+          </Buttons>
+        </Details>
+        <Hr />
+        <Channel>
+          <ChannelInfo>
+            <Image src={channel.img} />
+            <ChannelDetail>
+              <ChannelName>{channel.name}</ChannelName>
+              <ChannelCounter>{channel.subscribers} subscribers</ChannelCounter>
+              <Description>
+                {currentVideo.desc}
+              </Description>
+            </ChannelDetail>
+          </ChannelInfo>
+          <Subscribe onClick={handleSub}>{currentUser.subscribedUsers?.includes(channel._id)
+            ? "SUBSCRIBED"
+            : "SUBSCRIBE"}</Subscribe>
+        </Channel>
+        <Hr />
+        <Comments />
+      </Content>
+      {/* <Recommendation>
+        <Card type="sm" />
+        <Card type="sm" />
+        <Card type="sm" />
+        <Card type="sm" />
+        <Card type="sm" />
+        <Card type="sm" />
+        <Card type="sm" />
+        <Card type="sm" />
+        <Card type="sm" />
+        <Card type="sm" />
+        <Card type="sm" />
+        <Card type="sm" />
+        <Card type="sm" />
+      </Recommendation> */}
+    </Container>
+  )
 }
 
 const Container = styled.div`
@@ -175,5 +224,9 @@ const Subscribe = styled.button`
   padding: 10px 20px;
   cursor: pointer;
 `;
-
+const VideoFrame = styled.video`
+  max-height: 720px;
+  width: 100%;
+  object-fit: cover;
+`;
 export default Video

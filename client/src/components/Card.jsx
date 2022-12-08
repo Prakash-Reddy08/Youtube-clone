@@ -14,7 +14,7 @@ const Card = ({ type, video }) => {
   }, [video.userId]);
   return (
     <Container type={type}>
-      <Link to="/video/test" style={{ textDecoration: "none" }}>
+      <Link to={`/video/${video._id}`} style={{ textDecoration: "none" }}>
         <Image type={type} src={video.imgUrl} />
         <Details type={type}>
           <ChannelImage type={type} />
@@ -34,7 +34,7 @@ const Container = styled.div`
   margin-bottom: ${(props) => (props.type === "sm" ? "10px" : "45px")};
   cursor: pointer;
   justify-self:stretch ;
-  border-radius:5% ;
+  border-radius:6% ;
   display: ${(props) => props.type === "sm" && "flex"};
 `;
 
@@ -42,7 +42,6 @@ const Image = styled.img`
   width: 100%;
   border-radius:5% ;
   height: ${(props) => (props.type === "sm" ? "120px" : "167px")};
-  background-color: #999;
   flex: 1;
 `;
 
