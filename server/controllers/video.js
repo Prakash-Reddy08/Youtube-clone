@@ -4,7 +4,7 @@ import createError from "../error.js"
 
 export const addVideo = async (req, res, next) => {
     try {
-        const video = await Video.create({ userId: req.user.id, ...req.body })
+        const video = await Video.create({ userId: req.user.id, videoUrl: `/${req.file.path}`, ...req.body })
         res.json({ video }).status(200)
     } catch (err) {
         next(err)

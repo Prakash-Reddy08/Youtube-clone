@@ -6,6 +6,10 @@ import commentRoutes from "./routes/comments.js"
 import authRoute from "./routes/auth.js"
 import cookieParser from 'cookie-parser'
 import cors from 'cors'
+import path, { dirname } from 'path'
+import { fileURLToPath } from 'url';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
 const app = express();
 const PORT = 5000;
 connectDB();
@@ -15,6 +19,8 @@ app.use(cors({
     credentials: true
 }));
 app.use(express.json())
+app.use(express.urlencoded({ extended: true }));
+app.use('/public', express.static(path.join(__dirname, 'public')))
 app.use(cookieParser())
 app.use("/api/auth", authRoute)
 app.use("/api/users", userRoutes)

@@ -4,8 +4,7 @@ import createError from '../error.js'
 import jwt from 'jsonwebtoken'
 import env from 'dotenv'
 env.config();
-const ACCESS_TOKEN_EXPIRE_TIME = 300;
-const REFRESH_TOKEN_EXPIRE_TIME = '1d'
+const ACCESS_TOKEN_EXPIRE_TIME = '1d'
 export const signup = async (req, res, next) => {
     try {
         const { name, email, password } = req.body;
@@ -51,13 +50,9 @@ export const signin = async (req, res, next) => {
             return next(createError(400, "Incorrect Email or Password"))
         }
         const accessToken = jwt.sign({ id: foundUser._id }, process.env.ACCESSTOKEN_SECRET, { expiresIn: ACCESS_TOKEN_EXPIRE_TIME })
-        const refreshToken = jwt.sign({ id: foundUser._id }, process.env.REFRESHTOKEN_SECRET, { expiresIn: REFRESH_TOKEN_EXPIRE_TIME })
-        await User.findOneAndUpdate({ _id: foundUser._id },
-            { refreshToken }
-        )
-        const { password: psw, refreshToken: rft, ...otherDetails } = foundUser._doc;
-        res.cookie('refresh_token', refreshToken, { httpOnly: true, sameSite: 'none', secure: true, maxAge: 24 * 60 * 60 * 1000 })
-        res.json({ accessToken, ...otherDetails })
+        const { password: psw, ...otherDetails } = foundUser._doc;
+        res.cookie('access_token', accessToken, { httpOnly: true, sameSite: 'none', secure: true, maxAge: 24 * 60 * 60 * 1000 })
+        res.json({ ...otherDetails })
     } catch (error) {
         next(error);
     }

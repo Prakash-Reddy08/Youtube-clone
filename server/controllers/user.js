@@ -31,41 +31,34 @@ export const deleteUser = async (req, res, next) => {
 export const getUser = async (req, res, next) => {
     try {
         const user = await User.findById(req.params.id);
-        res.status(200).json(user);
+        const { password, ...otherDetails } = user._doc;
+        res.status(200).json(otherDetails);
     } catch (err) {
         next(err);
     }
 }
 export const subscribe = async (req, res, next) => {
     try {
-        const isSubscribed = await User.find({ subscribedUsers: { "$in": [req.params.id] } });
-        if (!isSubscribed.length) {
-            await User.findByIdAndUpdate(req.user.id, {
-                $push: { subscribedUsers: req.params.id },
-            });
-            await User.findByIdAndUpdate(req.params.id, {
-                $inc: { subscribers: 1 },
-            });
-            return res.status(200).json("Subscription successfull.")
-        }
-        return next(createError(400, "already subscribed"));
+        await User.findByIdAndUpdate(req.user.id, {
+            $push: { subscribedUsers: req.params.id },
+        });
+        await User.findByIdAndUpdate(req.params.id, {
+            $inc: { subscribers: 1 },
+        });
+        return res.status(200).json("Subscription successfull.")
     } catch (err) {
         next(err);
     }
 }
 export const unSubscribe = async (req, res, next) => {
     try {
-        const isSubscribed = await User.find({ subscribedUsers: { "$in": [req.params.id] } });
-        if (isSubscribed) {
-            await User.findByIdAndUpdate(req.user.id, {
-                $pull: { subscribedUsers: req.params.id },
-            });
-            await User.findByIdAndUpdate(req.params.id, {
-                $inc: { subscribers: -1 },
-            });
-            return res.status(200).json("Unsubscription successfull.")
-        }
-        return next(createError(400, "not subscribed to this channer"))
+        await User.findByIdAndUpdate(req.user.id, {
+            $pull: { subscribedUsers: req.params.id },
+        });
+        await User.findByIdAndUpdate(req.params.id, {
+            $inc: { subscribers: -1 },
+        });
+        return res.status(200).json("Unsubscription successfull.")
     } catch (err) {
         next(err);
     }
