@@ -1,6 +1,5 @@
 import React, { useState } from 'react'
 import styled from 'styled-components';
-import Card from '../components/Card';
 import ThumbUpOutlinedIcon from "@mui/icons-material/ThumbUpOutlined";
 import ThumbDownIcon from "@mui/icons-material/ThumbDown";
 import ThumbUpIcon from '@mui/icons-material/ThumbUp';
@@ -15,6 +14,7 @@ import { axiosPrivate, instance } from '../utils/axios';
 import { dislike, fetchFailure, fetchStart, fetchSuccess, like } from '../features/videoSlice';
 import { format } from 'timeago.js';
 import { subscription } from '../features/userSlice';
+import Recommendation from '../components/Recommendation';
 
 const Video = () => {
   const { currentUser } = useSelector(state => state.user);
@@ -60,7 +60,6 @@ const Video = () => {
       console.log(error.response.data.message);
     }
   };
-  const url = process.env.REACT_APP_SERVER_URL.replace("/api", "")
   if (loading) {
     return <>
       Loading...
@@ -70,7 +69,7 @@ const Video = () => {
     <Container>
       <Content>
         <VideoWrapper>
-          <VideoFrame controls><source src={url + currentVideo.videoUrl} /></VideoFrame>
+          <VideoFrame controls><source src={"http://localhost:5000" + currentVideo.videoUrl} /></VideoFrame>
         </VideoWrapper>
         <Title>{currentVideo.title}</Title>
         <Details>
@@ -102,28 +101,14 @@ const Video = () => {
               </Description>
             </ChannelDetail>
           </ChannelInfo>
-          <Subscribe onClick={handleSub}>{currentUser.subscribedUsers?.includes(channel._id)
+          <Subscribe onClick={handleSub}>{currentUser?.subscribedUsers?.includes(channel._id)
             ? "SUBSCRIBED"
             : "SUBSCRIBE"}</Subscribe>
         </Channel>
         <Hr />
-        <Comments />
+        <Comments videoId={currentVideo._id} />
       </Content>
-      {/* <Recommendation>
-        <Card type="sm" />
-        <Card type="sm" />
-        <Card type="sm" />
-        <Card type="sm" />
-        <Card type="sm" />
-        <Card type="sm" />
-        <Card type="sm" />
-        <Card type="sm" />
-        <Card type="sm" />
-        <Card type="sm" />
-        <Card type="sm" />
-        <Card type="sm" />
-        <Card type="sm" />
-      </Recommendation> */}
+      <Recommendation tags={currentVideo.tags} />
     </Container>
   )
 }
@@ -174,9 +159,6 @@ const Hr = styled.hr`
   border: 0.5px solid ${({ theme }) => theme.soft};
 `;
 
-const Recommendation = styled.div`
-  flex: 2;
-`;
 const Channel = styled.div`
   display: flex;
   justify-content: space-between;

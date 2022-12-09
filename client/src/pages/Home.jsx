@@ -12,7 +12,7 @@ const Home = ({ type }) => {
                 setVideos(res.data);
             }
             catch (error) {
-                console.log(error.data.message);
+                console.log(error.response.data.message);
             }
         }
         fetchRandomVideos();

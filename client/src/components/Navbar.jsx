@@ -3,19 +3,21 @@ import styled from 'styled-components';
 import AccountCircleOutlinedIcon from "@mui/icons-material/AccountCircleOutlined";
 import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
 import VideoCallOutlinedIcon from "@mui/icons-material/VideoCallOutlined";
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux'
 import UploadModal from './UploadModal';
 const Navbar = () => {
+  const navigate = useNavigate();
   const { currentUser } = useSelector(state => state.user)
   const [open, setOpen] = useState(false);
+  const [query, setQuery] = useState("");
   return (
     <>
       <Container>
         <Wrapper>
           <Search>
-            <Input placeholder="Search" />
-            <SearchOutlinedIcon />
+            <Input placeholder="Search" onChange={(e) => setQuery(e.target.value)} />
+            <SearchOutlinedIcon onClick={() => navigate(`/search/?q=${query}`)} />
           </Search>
           {currentUser ?
             (<User>
@@ -79,9 +81,12 @@ const Search = styled.div`
   padding: 5px;
   border: 1px solid #ccc;
   border-radius: 3px;
-`;
+  color: ${({ theme }) => theme.text};
+  cursor: pointer;
+  `;
 
 const Input = styled.input`
+  width:100% ;
   border: none;
   background-color: transparent;
   outline: none;
