@@ -32,6 +32,7 @@ const Card = ({ type, video }) => {
 const Container = styled.div`
   width: ${(props) => props.type !== "sm" && "auto"};
   margin-bottom: ${(props) => (props.type === "sm" ? "10px" : "45px")};
+  max-width:300px ;
   cursor: pointer;
   justify-self:stretch ;
   border-radius:6% ;

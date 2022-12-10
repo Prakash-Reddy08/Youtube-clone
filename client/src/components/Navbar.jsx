@@ -3,10 +3,11 @@ import styled from 'styled-components';
 import AccountCircleOutlinedIcon from "@mui/icons-material/AccountCircleOutlined";
 import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
 import VideoCallOutlinedIcon from "@mui/icons-material/VideoCallOutlined";
+import MenuIcon from '@mui/icons-material/Menu';
 import { Link, useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux'
 import UploadModal from './UploadModal';
-const Navbar = () => {
+const Navbar = ({ setToggleMenu }) => {
   const navigate = useNavigate();
   const { currentUser } = useSelector(state => state.user)
   const [open, setOpen] = useState(false);
@@ -15,6 +16,9 @@ const Navbar = () => {
     <>
       <Container>
         <Wrapper>
+          <HamMenu>
+            <MenuIcon onClick={() => setToggleMenu(true)} />
+          </HamMenu>
           <Search>
             <Input placeholder="Search" onChange={(e) => setQuery(e.target.value)} />
             <SearchOutlinedIcon onClick={() => navigate(`/search/?q=${query}`)} />
@@ -53,13 +57,6 @@ const Avatar = styled.img`
   background-color: #999;
 `;
 
-const Container = styled.div`
-  position: sticky;
-  top: 0;
-  background-color: ${({ theme }) => theme.bgLighter};
-  height: 56px;
-`;
-
 const Wrapper = styled.div`
   display: flex;
   align-items: center;
@@ -69,11 +66,13 @@ const Wrapper = styled.div`
   position: relative;
 `;
 
+const HamMenu = styled.div`
+  color: ${({ theme }) => theme.text};
+  cursor: pointer;
+`
+
 const Search = styled.div`
   width: 40%;
-  position: absolute;
-  left: 0px;
-  right: 0px;
   margin: auto;
   display: flex;
   align-items: center;
@@ -105,5 +104,18 @@ const Button = styled.button`
   align-items: center;
   gap: 5px;
 `;
-
+const Container = styled.div`
+  position: sticky;
+  top: 0;
+  background-color: ${({ theme }) => theme.bgLighter};
+  height: 56px;
+  ${HamMenu}{
+    display:none ;
+  }
+  @media (max-width: 1100px){
+    ${HamMenu}{
+      display:block ;
+    }
+  }
+`;
 export default Navbar

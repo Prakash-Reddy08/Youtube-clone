@@ -28,7 +28,7 @@ const Container = styled.div`
     grid-template-columns:repeat(auto-fit,minmax(240px,1fr)) ;
     gap: 1.4rem ;
     justify-items:center ;
-    align-items:center ;
+    min-height:100vh ;
 `;
 
 export default Search;

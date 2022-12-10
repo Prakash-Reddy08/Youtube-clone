@@ -15,13 +15,16 @@ import Search from './pages/Search';
 
 function App() {
   const [darkMode, setDarkMode] = useState(true);
+  const [toggleMenu, setToggleMenu] = useState(false);
   return (
     <ThemeProvider theme={darkMode ? darkTheme : lightTheme}>
-      <Container>
+      <Container toggleMenu={toggleMenu}>
         <BrowserRouter>
-          <Menu darkMode={darkMode} setDarkMode={setDarkMode} />
+          <MenuBar toggleMenu={toggleMenu}>
+            <Menu darkMode={darkMode} setToggleMenu={setToggleMenu} toggleMenu={toggleMenu} setDarkMode={setDarkMode} />
+          </MenuBar>
           <Main>
-            <Navbar />
+            <Navbar setToggleMenu={setToggleMenu} />
             <Wrapper>
               <Routes>
                 <Route>
@@ -42,8 +45,17 @@ function App() {
     </ThemeProvider>
   )
 }
+const MenuBar = styled.div`
+`
 const Container = styled.div`
   display: flex;
+  @media (max-width:1100px){
+    ${MenuBar}{
+      display:${({ toggleMenu }) => toggleMenu ? "flex" : "none"} ;
+      position:fixed;
+      z-index:3 ;
+    }
+  }
 `
 const Main = styled.div`
   flex: 7;

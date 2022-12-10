@@ -29,6 +29,7 @@ const Home = ({ type }) => {
 }
 
 const Container = styled.div`
+    min-height:100vh ;
     display:grid ;
     grid-template-columns:repeat(auto-fit,minmax(240px,1fr)) ;
     gap: 1.4rem ;

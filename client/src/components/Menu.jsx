@@ -16,19 +16,22 @@ import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
 import FlagOutlinedIcon from "@mui/icons-material/FlagOutlined";
 import HelpOutlineOutlinedIcon from "@mui/icons-material/HelpOutlineOutlined";
 import SettingsBrightnessOutlinedIcon from "@mui/icons-material/SettingsBrightnessOutlined";
-import { Link } from "react-router-dom";
+import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft'; import { Link } from "react-router-dom";
 import { useSelector } from 'react-redux';
-const Menu = ({ setDarkMode, darkMode }) => {
+const Menu = ({ setDarkMode, darkMode, setToggleMenu, toggleMenu }) => {
     const { currentUser } = useSelector(state => state.user)
     return (
         <Container>
             <Wrapper>
-                <Link to="/" style={{ textDecoration: "none", color: "inherit" }}>
-                    <Logo>
-                        <Img src={logo} />
-                        Youtube
-                    </Logo>
-                </Link>
+                <Top toggleMenu={toggleMenu}>
+                    <Link to="/" style={{ textDecoration: "none", color: "inherit" }}>
+                        <Logo>
+                            <Img src={logo} />
+                            Youtube
+                        </Logo>
+                    </Link>
+                    {toggleMenu && <KeyboardArrowLeftIcon onClick={() => setToggleMenu(false)} style={{ cursor: "pointer" }} />}
+                </Top>
                 <Link to="/" style={{ textDecoration: "none", color: "inherit" }}>
                     <Item>
                         <HomeIcon />
@@ -123,6 +126,11 @@ const Container = styled.div`
     position:sticky ;
     top:0 ;
     overflow-y:scroll ;
+`
+const Top = styled.div`
+    display:flex ;
+    flex-direction:${({ toggleMenu }) => toggleMenu && "row-reverse"} ;
+    justify-content:space-between;
 `
 const Wrapper = styled.div`
    padding:18px 26px ;
